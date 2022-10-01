@@ -15,7 +15,20 @@ class Application(tkinter.Frame):
         quit_btn['text'] = '閉じる'
         quit_btn['command'] = self.root.destroy
         quit_btn.pack(side='bottom')
-
+        
+        # チーム成績生成ボタン
+        team_record_btn = tkinter.Button(self, text="チーム成績を生成",
+                                         command=self.test)
+        team_record_btn.place(x= 140, y = 100)
+        
+        # 個人成績生成ボタン
+        player_record_btn = tkinter.Button(self, text="個人成績を生成",
+                                           command=self.test)
+        player_record_btn.place(x = 140, y = 150)
+        
+    def test(self):
+        print('ボタンが押された')
+        
 
 root = tkinter.Tk()
 root.title('成績自動生成アプリ')
