@@ -1,4 +1,5 @@
 import tkinter
+import teamRecord
 
 class Application(tkinter.Frame):
     def __init__(self, root=None):
@@ -18,7 +19,7 @@ class Application(tkinter.Frame):
         
         # チーム成績生成ボタン
         team_record_btn = tkinter.Button(self, text="チーム成績を生成",
-                                         command=self.test)
+                                         command=teamRecord.main)
         team_record_btn.place(x= 140, y = 100)
         
         # 個人成績生成ボタン
@@ -30,8 +31,12 @@ class Application(tkinter.Frame):
         print('ボタンが押された')
         
 
-root = tkinter.Tk()
-root.title('成績自動生成アプリ')
-root.geometry('400x300')
-app = Application(root=root)
-app.mainloop()
+def main():
+    root = tkinter.Tk()
+    root.title('成績自動生成アプリ')
+    root.geometry('400x300')
+    app = Application(root=root)
+    app.mainloop()
+
+if __name__ == "__main__":
+    main()
