@@ -1,24 +1,29 @@
 import os
-import openpyxl as px
-from openpyxl.xml.constants import NAMESPACES
+# import openpyxl as px
+# from openpyxl.xml.constants import NAMESPACES
 import pandas as pd
 import glob
-from openpyxl.styles import Alignment, PatternFill
-import datetime
+# from openpyxl.styles import Alignment, PatternFill
+# import datetime
 
-
-
-def make_team_record():
-    print("実行")
     
 def main():
     # パスを設定
-    import_foloder_path = os.getcwd()
-    export_folder_path = os.getcwd()
-    print(import_foloder_path)
-    print(export_folder_path)
+    import_foloder_path = os.path.dirname(__file__) + '\試合結果'
+    export_folder_path = os.path.dirname(__file__) + '\チーム成績'
     
-    # make_team_record()
+    # 試合結果のデータをdf_concatでつなぎ合わせる
+    path = import_foloder_path + '\*.xlsx'
+    file_paths = glob.glob(path)
+    df_bat_concat = pd.DataFrame()
+    df_pitch_concat = pd.DataFrame()
+    for path in file_paths:
+        df_bat_read_excel   = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
+        df_pitch_read_excel = pd.read_excel(path, sheet_name='投手成績', index_col=0)
+        df_bat_concat=pd.concat([df_bat_concat, df_bat_read_excel])
+        df_pitch_concat = pd.concat([df_pitch_concat, df_pitch_read_excel])
+        
+
     
 if __name__ == '__main__':
     main()
@@ -27,17 +32,8 @@ if __name__ == '__main__':
 # import_folder_path = 'C:/Users/Mori Yuki/Desktop/岡大軟式野球DB/試合結果'
 
 
-# #試合結果のデータをdf_concatでつなぎ合わせる
-# path = import_folder_path + '/*.xlsx'
-# file_path = glob.glob(path)
-# df_bat_concat = pd.DataFrame()
-# df_pitch_concat = pd.DataFrame()
-# for i in file_path:
-#     df_bat_read_excel=pd.read_excel(i, sheet_name='打撃成績', index_col=0)
-#     df_pitch_read_excel = pd.read_excel(i, sheet_name='投手成績', index_col=0)
-    
-#     df_bat_concat=pd.concat([df_bat_concat, df_bat_read_excel])
-#     df_pitch_concat = pd.concat([df_pitch_concat, df_pitch_read_excel])
+
+
 
 
 # #データを新チーム用にする 
