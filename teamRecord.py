@@ -113,8 +113,6 @@ def main():
 if __name__ == '__main__':
     main()
 
-# export_file_team_path = 'C:/Users/Mori Yuki/Desktop/岡大軟式野球DB/チーム成績/通算'
-# import_folder_path = 'C:/Users/Mori Yuki/Desktop/岡大軟式野球DB/試合結果'
 
 # # 書式設定
 
