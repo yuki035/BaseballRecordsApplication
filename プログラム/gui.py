@@ -30,8 +30,12 @@ class Application(tkinter.Frame):
         print('ボタンが押された')
         
 
-root = tkinter.Tk()
-root.title('成績自動生成アプリ')
-root.geometry('400x300')
-app = Application(root=root)
-app.mainloop()
+def main():
+    root = tkinter.Tk()
+    root.title('成績自動生成アプリ')
+    root.geometry('400x300')
+    app = Application(root=root)
+    app.mainloop()
+
+if __name__ == "__main__":
+    main()
