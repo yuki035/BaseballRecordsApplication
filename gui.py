@@ -1,4 +1,5 @@
 import tkinter
+import teamRecord
 
 class Application(tkinter.Frame):
     def __init__(self, root=None):
@@ -18,7 +19,7 @@ class Application(tkinter.Frame):
         
         # チーム成績生成ボタン
         team_record_btn = tkinter.Button(self, text="チーム成績を生成",
-                                         command=self.test)
+                                         command=teamRecord.main)
         team_record_btn.place(x= 140, y = 100)
         
         # 個人成績生成ボタン
