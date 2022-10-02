@@ -59,17 +59,17 @@ def main():
     # パスを設定
     dirname = os.path.dirname(__file__)
     import_foloder_path = dirname + '\試合結果'
-    export_folder_path = dirname + '\チーム成績'
+    export_folder_path  = dirname + '\チーム成績'
 
     # 試合結果のデータをdf_concatでつなぎ合わせる
     path = import_foloder_path + '\*.xlsx'
     file_paths = glob.glob(path)
-    df_bat_concat = pd.DataFrame()
+    df_bat_concat   = pd.DataFrame()
     df_pitch_concat = pd.DataFrame()
     for path in file_paths:
-        df_bat_read_excel = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
+        df_bat_read_excel   = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
         df_pitch_read_excel = pd.read_excel(path, sheet_name='投手成績', index_col=0)
-        df_bat_concat = pd.concat([df_bat_concat, df_bat_read_excel])
+        df_bat_concat   = pd.concat([df_bat_concat, df_bat_read_excel])
         df_pitch_concat = pd.concat([df_pitch_concat, df_pitch_read_excel])
 
     # カラムに試合or登板を追加
@@ -86,15 +86,15 @@ def main():
 
     # 成績を生成する選手を抽出
     players_name = get_players_name(dirname)
-    df_bat_sum = df_bat_sum.filter(items=players_name, axis=0)
+    df_bat_sum   = df_bat_sum.filter(items=players_name, axis=0)
     df_pitch_sum = df_pitch_sum.filter(items=players_name, axis=0)
 
     # チーム総合をデータ化
     games = len(file_paths)
 
-    df_bat_sum.loc['チーム総合'] = df_bat_sum.iloc[0:, 1:].sum()
-    df_bat_sum.loc['チーム総合', '試合'] = games
+    df_bat_sum.loc['チーム総合']   = df_bat_sum.iloc[0:, 1:].sum()
     df_pitch_sum.loc['チーム総合'] = df_pitch_sum.iloc[0:, 1:].sum()
+    df_bat_sum.loc['チーム総合', '試合']   = games
     df_pitch_sum.loc['チーム総合', '登板'] = games
 
     # 指標計算
@@ -103,7 +103,7 @@ def main():
     
     #一旦ファイルに出力する
     date = str(datetime.date.today())
-    with pd.ExcelWriter(export_folder_path+'/通算_'+date+'.xlsx') as writer:
+    with pd.ExcelWriter(export_folder_path + '/通算_' + date + '.xlsx') as writer:
         df_bat_sum.to_excel(writer, sheet_name='打撃成績')
         df_pitch_sum.to_excel(writer, sheet_name='投手成績')
         
