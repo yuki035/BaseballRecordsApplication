@@ -6,6 +6,7 @@ import pandas as pd
 import glob
 # from openpyxl.styles import Alignment, PatternFill
 import datetime
+import subprocess
 
 # 成績を生成する選手を取得
 def get_players_name(path: str):
@@ -100,13 +101,15 @@ def main():
     calc_bat_record(df_bat_sum)
     calc_pitch_record(df_pitch_sum)
     
-    
-    
     #一旦ファイルに出力する
     date = str(datetime.date.today())
     with pd.ExcelWriter(export_folder_path+'/通算_'+date+'.xlsx') as writer:
         df_bat_sum.to_excel(writer, sheet_name='打撃成績')
         df_pitch_sum.to_excel(writer, sheet_name='投手成績')
+        
+    
+    # 出力したフォルダを開く
+    subprocess.Popen(["explorer", export_folder_path], shell=True)
 
     print("完了")
 
