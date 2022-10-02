@@ -21,25 +21,21 @@ def get_players_name(path: str):
 
 # 打撃成績を計算
 def calc_bat_record(df: pd.DataFrame):
+    divisor = df['打数'] + df['四球'] + df['死球'] + df['犠飛']
+    wOBA_divided = 0.692*df['四球'] + 0.73*df['死球'] + 0.966*df['失策'] + 0.865 *df['単打'] + 1.334*df['二塁打'] + 1.725*df['三塁打'] + 2.065*df['本塁打']
     df['盗塁成功率'] = df['盗塁'] / df['盗塁企画']
     df['打率'] = df['安打'] / df['打数']
-    divisor = df['打数'] + df['四球'] + df['死球'] + df['犠飛']
     df['出塁率'] = (df['安打'] + df['四球'] + df['死球']) / divisor
     df['長打率'] = df['塁打'] / df['打数']
     df['OPS'] = df['出塁率'] + df['長打率']
     df['BB/K'] = df['四球'] / df['三振']
-    wOBA_divided = 0.692*df['四球'] + 0.73*df['死球'] + 0.966*df['失策'] + 0.865 *df['単打'] + 1.334*df['二塁打'] + 1.725*df['三塁打'] + 2.065*df['本塁打']
     df['wOBA'] = wOBA_divided / divisor
-    
-    #欠損値を0で補完
     df.fillna(0, inplace=True)
     
 # 投手成績を計算
 def calc_pitch_record(df: pd.DataFrame):
-    # 投球回（Innings pitched / IP）
-    IP = df['奪アウト数']/3
-    # 奪アウト数　→　投球回数
-    q, mod = divmod(df['奪アウト数'], 3)
+    IP = df['奪アウト数']/3                 # 投球回（Innings pitched / IP）
+    q, mod = divmod(df['奪アウト数'], 3)    # 奪アウト数　→　投球回数
     df['奪アウト数'] = q + 0.1*mod
     df.rename(columns={'奪アウト数':'投球回'}, inplace=True)
     df['防御率'] = df['自責点']*7 / IP
@@ -49,13 +45,11 @@ def calc_pitch_record(df: pd.DataFrame):
     df['被打率'] = df['被安打'] / df['打者数']
     df['WHIP'] = (df['与四球'] + df['被安打']) / IP
     df['投球数/回'] = df['投球数']/IP
-    
-    #欠損値を0で補完
     df.fillna(0, inplace=True)
 
 
 def main():
-    print("開始")
+    print("start")
     # パスを設定
     dirname = os.path.dirname(__file__)
     import_foloder_path = dirname + '\試合結果'
@@ -111,7 +105,7 @@ def main():
     # 出力したフォルダを開く
     subprocess.Popen(["explorer", export_folder_path], shell=True)
 
-    print("完了")
+    print("success!")
 
 if __name__ == '__main__':
     main()
