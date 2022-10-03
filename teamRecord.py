@@ -1,12 +1,12 @@
 import os
-from pathlib import Path
-import openpyxl as px
-from openpyxl.xml.constants import NAMESPACES
-import pandas as pd
 import glob
-from openpyxl.styles import Alignment, PatternFill
+import pandas as pd
 import datetime
 import subprocess
+import openpyxl as px
+from openpyxl.xml.constants import NAMESPACES
+from openpyxl.styles import Alignment, PatternFill
+
 
 # 成績を生成する選手を取得
 def get_players_name(path: str):
@@ -47,7 +47,7 @@ def calc_pitch_record(df: pd.DataFrame):
     df['投球数/回'] = df['投球数']/IP
     df.fillna(0, inplace=True)
     
- # 率を小数第三位までに設定
+# 率を小数第三位までに設定
 def set_rate_format(beginning: int, ws: px.Workbook.worksheets):
     for col in ws.iter_cols(min_row=2, min_col=beginning):
         for cell in col:
