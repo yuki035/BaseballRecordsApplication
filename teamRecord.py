@@ -7,6 +7,19 @@ import openpyxl as px
 from openpyxl.xml.constants import NAMESPACES
 from openpyxl.styles import Alignment, PatternFill
 
+# フォルダにあるエクセルファイルの絶対パスのリストを取得
+def get_xlsx_file_paths(folder_path):
+    file_path = folder_path + '\*.xlsx'
+    return glob.glob(file_path)
+    
+# 試合結果の全データを打撃/投手別で統合
+def concat_games(paths, df_bat, df_pitch):
+    for path in paths:
+        df_bat_read_excel   = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
+        df_pitch_read_excel = pd.read_excel(path, sheet_name='投手成績', index_col=0)
+        df_bat   = pd.concat([df_bat, df_bat_read_excel])
+        df_pitch = pd.concat([df_pitch, df_pitch_read_excel])
+    return df_bat, df_pitch
 
 # 成績を生成する選手を取得
 def get_players_name(path: str):
@@ -81,6 +94,7 @@ def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color
             cell.fill = PatternFill(patternType = 'solid', fgColor=title_color)
 
 def main():
+    
     print("start")
     
     # パスを設定
@@ -88,17 +102,12 @@ def main():
     import_foloder_path = dirname + '\試合結果'
     export_folder_path  = dirname + '\チーム成績'
 
-    # 試合結果のデータをdf_concatでつなぎ合わせる
-    path = import_foloder_path + '\*.xlsx'
-    file_paths = glob.glob(path)
+    # 試合結果の全データを統合
     df_bat_concat   = pd.DataFrame()
     df_pitch_concat = pd.DataFrame()
-    for path in file_paths:
-        df_bat_read_excel   = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
-        df_pitch_read_excel = pd.read_excel(path, sheet_name='投手成績', index_col=0)
-        df_bat_concat   = pd.concat([df_bat_concat, df_bat_read_excel])
-        df_pitch_concat = pd.concat([df_pitch_concat, df_pitch_read_excel])
-
+    game_file_paths = get_xlsx_file_paths(folder_path=import_foloder_path)
+    df_bat_concat, df_pitch_concat = concat_games(paths=game_file_paths, df_bat=df_bat_concat, df_pitch=df_pitch_concat)
+    
     # カラムに試合or登板を追加
     df_bat_concat['試合'] = 1
     df_pitch_concat['登板'] = 1
@@ -117,7 +126,7 @@ def main():
     df_pitch_sum = df_pitch_sum.filter(items=players_name, axis=0)
 
     # チーム総合をデータ化
-    games = len(file_paths)
+    games = len(game_file_paths)
 
     df_bat_sum.loc['チーム総合']   = df_bat_sum.iloc[0:, 1:].sum()
     df_pitch_sum.loc['チーム総合'] = df_pitch_sum.iloc[0:, 1:].sum()
@@ -180,10 +189,8 @@ def main():
     set_backgroud_color(ws=ws_bat, title_color=BAT_TITL_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
     set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITL_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
     
-    
     #保存
     wb.save(export_folder_path+'/通算_'+date+'.xlsx')
-        
     
     # 出力したフォルダを開く
     subprocess.Popen(["explorer", export_folder_path], shell=True)
