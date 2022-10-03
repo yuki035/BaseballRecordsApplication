@@ -112,7 +112,7 @@ def main():
     df_bat_concat['試合'] = 1
     df_pitch_concat['登板'] = 1
 
-    # 集計データを合計したデータフレームを作成
+    # 各項目を合計したデータフレームを作成
     df_bat_sum = df_bat_concat[['試合', '打席', '打数', '安打', '単打', '二塁打', '三塁打', '本塁打', '塁打',
                                 '打点', '得点', '四球', '死球', '犠打', '犠飛', '打撃妨害', '失策', '野選',
                                 '振り逃げ', '三振', '併殺', '盗塁企画', '盗塁']].groupby('名前').sum()
@@ -127,7 +127,6 @@ def main():
 
     # チーム総合をデータ化
     games = len(game_file_paths)
-
     df_bat_sum.loc['チーム総合']   = df_bat_sum.iloc[0:, 1:].sum()
     df_pitch_sum.loc['チーム総合'] = df_pitch_sum.iloc[0:, 1:].sum()
     df_bat_sum.loc['チーム総合', '試合']   = games
@@ -180,14 +179,14 @@ def main():
     ws_pitch['A1'].alignment = Alignment(horizontal = 'center', vertical='center')
     
     #　セルの塗りつぶし　1列目→1行目→最終行目
-    BAT_TITL_CELL_COLOR = 'A4C6FF'
+    BAT_TITLE_CELL_COLOR = 'A4C6FF'
     BAT_NAME_CELL_COLOR = 'D9E5FF'
 
-    PITCH_TITL_CELL_COLOR = 'FFA3A3'
+    PITCH_TITLE_CELL_COLOR = 'FFA3A3'
     PITCH_NAME_CELL_COLOR = 'FFD9D9'
     
-    set_backgroud_color(ws=ws_bat, title_color=BAT_TITL_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
-    set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITL_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
+    set_backgroud_color(ws=ws_bat, title_color=BAT_TITLE_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
+    set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITLE_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
     
     #保存
     wb.save(export_folder_path+'/通算_'+date+'.xlsx')
