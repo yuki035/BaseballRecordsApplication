@@ -78,6 +78,13 @@ def set_column_width(ws: px.Workbook.worksheets, beginning_rate: int):
             width = 7
         ws.column_dimensions[column_str].width = width
         
+# 一行目を縦書きに設定
+def set_vertical_writing_row1(ws: px.Workbook.worksheets):
+    for row in ws.iter_rows(min_col=2,max_row=1):
+        for cell in row:
+            cell.alignment = Alignment(vertical='center', textRotation=255)
+    
+
 #　セルの塗りつぶし　1列目→1行目→最終行目
 def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color: str):
     max_row = ws.max_row
@@ -162,13 +169,8 @@ def main():
     set_rate_format(beginning=beginning_pitch_rate, ws=ws_pitch)
         
     # 一行目を縦書きに設定
-    for row in ws_bat.iter_rows(min_col=2,max_row=1):
-        for cell in row:
-            cell.alignment = Alignment(vertical='center', textRotation=255)
-    
-    for row in ws_pitch.iter_rows(min_col=2,max_row=1):
-        for cell in row:
-            cell.alignment = Alignment(vertical='center', textRotation=255)        
+    set_vertical_writing_row1(ws_bat)
+    set_vertical_writing_row1(ws_pitch)       
         
     # 列の幅を設定
     set_column_width(ws=ws_bat, beginning_rate=beginning_bat_rate)
