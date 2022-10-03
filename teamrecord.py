@@ -66,7 +66,7 @@ def set_rate_format(beginning: int, ws: px.Workbook.worksheets):
         for cell in col:
             cell.number_format = "0.000"
 
-# set column width
+# 列の幅を設定
 def set_column_width(ws: px.Workbook.worksheets, beginning_rate: int):
     name_width = 14
     width = 5
@@ -84,8 +84,7 @@ def set_vertical_writing_row1(ws: px.Workbook.worksheets):
         for cell in row:
             cell.alignment = Alignment(vertical='center', textRotation=255)
     
-
-#　セルの塗りつぶし　1列目→1行目→最終行目
+#　セルの背景色を設定
 def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color: str):
     max_row = ws.max_row
     # name
