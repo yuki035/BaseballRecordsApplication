@@ -1,12 +1,25 @@
 import os
-from pathlib import Path
-import openpyxl as px
-from openpyxl.xml.constants import NAMESPACES
-import pandas as pd
 import glob
-from openpyxl.styles import Alignment, PatternFill
+import pandas as pd
 import datetime
 import subprocess
+import openpyxl as px
+from openpyxl.xml.constants import NAMESPACES
+from openpyxl.styles import Alignment, PatternFill
+
+# フォルダにあるエクセルファイルの絶対パスのリストを取得
+def get_xlsx_file_paths(folder_path):
+    file_path = folder_path + '\*.xlsx'
+    return glob.glob(file_path)
+    
+# 試合結果の全データを打撃/投手別で統合
+def concat_games(paths, df_bat, df_pitch):
+    for path in paths:
+        df_bat_read_excel   = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
+        df_pitch_read_excel = pd.read_excel(path, sheet_name='投手成績', index_col=0)
+        df_bat   = pd.concat([df_bat, df_bat_read_excel])
+        df_pitch = pd.concat([df_pitch, df_pitch_read_excel])
+    return df_bat, df_pitch
 
 # 成績を生成する選手を取得
 def get_players_name(path: str):
@@ -47,13 +60,13 @@ def calc_pitch_record(df: pd.DataFrame):
     df['投球数/回'] = df['投球数']/IP
     df.fillna(0, inplace=True)
     
- # 率を小数第三位までに設定
+# 率を小数第三位までに設定
 def set_rate_format(beginning: int, ws: px.Workbook.worksheets):
     for col in ws.iter_cols(min_row=2, min_col=beginning):
         for cell in col:
             cell.number_format = "0.000"
 
-# set column width
+# 列の幅を設定
 def set_column_width(ws: px.Workbook.worksheets, beginning_rate: int):
     name_width = 14
     width = 5
@@ -65,7 +78,13 @@ def set_column_width(ws: px.Workbook.worksheets, beginning_rate: int):
             width = 7
         ws.column_dimensions[column_str].width = width
         
-#　セルの塗りつぶし　1列目→1行目→最終行目
+# 一行目を縦書きに設定
+def set_vertical_writing_row1(ws: px.Workbook.worksheets):
+    for row in ws.iter_rows(min_col=2,max_row=1):
+        for cell in row:
+            cell.alignment = Alignment(vertical='center', textRotation=255)
+    
+#　セルの背景色を設定
 def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color: str):
     max_row = ws.max_row
     # name
@@ -81,6 +100,7 @@ def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color
             cell.fill = PatternFill(patternType = 'solid', fgColor=title_color)
 
 def main():
+    
     print("start")
     
     # パスを設定
@@ -88,22 +108,17 @@ def main():
     import_foloder_path = dirname + '\試合結果'
     export_folder_path  = dirname + '\チーム成績'
 
-    # 試合結果のデータをdf_concatでつなぎ合わせる
-    path = import_foloder_path + '\*.xlsx'
-    file_paths = glob.glob(path)
+    # 試合結果の全データを統合
     df_bat_concat   = pd.DataFrame()
     df_pitch_concat = pd.DataFrame()
-    for path in file_paths:
-        df_bat_read_excel   = pd.read_excel(path, sheet_name='打撃成績', index_col=0)
-        df_pitch_read_excel = pd.read_excel(path, sheet_name='投手成績', index_col=0)
-        df_bat_concat   = pd.concat([df_bat_concat, df_bat_read_excel])
-        df_pitch_concat = pd.concat([df_pitch_concat, df_pitch_read_excel])
-
+    game_file_paths = get_xlsx_file_paths(folder_path=import_foloder_path)
+    df_bat_concat, df_pitch_concat = concat_games(paths=game_file_paths, df_bat=df_bat_concat, df_pitch=df_pitch_concat)
+    
     # カラムに試合or登板を追加
     df_bat_concat['試合'] = 1
     df_pitch_concat['登板'] = 1
 
-    # 集計データを合計したデータフレームを作成
+    # 各項目を合計したデータフレームを作成
     df_bat_sum = df_bat_concat[['試合', '打席', '打数', '安打', '単打', '二塁打', '三塁打', '本塁打', '塁打',
                                 '打点', '得点', '四球', '死球', '犠打', '犠飛', '打撃妨害', '失策', '野選',
                                 '振り逃げ', '三振', '併殺', '盗塁企画', '盗塁']].groupby('名前').sum()
@@ -117,8 +132,7 @@ def main():
     df_pitch_sum = df_pitch_sum.filter(items=players_name, axis=0)
 
     # チーム総合をデータ化
-    games = len(file_paths)
-
+    games = len(game_file_paths)
     df_bat_sum.loc['チーム総合']   = df_bat_sum.iloc[0:, 1:].sum()
     df_pitch_sum.loc['チーム総合'] = df_pitch_sum.iloc[0:, 1:].sum()
     df_bat_sum.loc['チーム総合', '試合']   = games
@@ -154,13 +168,8 @@ def main():
     set_rate_format(beginning=beginning_pitch_rate, ws=ws_pitch)
         
     # 一行目を縦書きに設定
-    for row in ws_bat.iter_rows(min_col=2,max_row=1):
-        for cell in row:
-            cell.alignment = Alignment(vertical='center', textRotation=255)
-    
-    for row in ws_pitch.iter_rows(min_col=2,max_row=1):
-        for cell in row:
-            cell.alignment = Alignment(vertical='center', textRotation=255)        
+    set_vertical_writing_row1(ws_bat)
+    set_vertical_writing_row1(ws_pitch)       
         
     # 列の幅を設定
     set_column_width(ws=ws_bat, beginning_rate=beginning_bat_rate)
@@ -171,19 +180,17 @@ def main():
     ws_pitch['A1'].alignment = Alignment(horizontal = 'center', vertical='center')
     
     #　セルの塗りつぶし　1列目→1行目→最終行目
-    BAT_TITL_CELL_COLOR = 'A4C6FF'
+    BAT_TITLE_CELL_COLOR = 'A4C6FF'
     BAT_NAME_CELL_COLOR = 'D9E5FF'
 
-    PITCH_TITL_CELL_COLOR = 'FFA3A3'
+    PITCH_TITLE_CELL_COLOR = 'FFA3A3'
     PITCH_NAME_CELL_COLOR = 'FFD9D9'
     
-    set_backgroud_color(ws=ws_bat, title_color=BAT_TITL_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
-    set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITL_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
-    
+    set_backgroud_color(ws=ws_bat, title_color=BAT_TITLE_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
+    set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITLE_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
     
     #保存
     wb.save(export_folder_path+'/通算_'+date+'.xlsx')
-        
     
     # 出力したフォルダを開く
     subprocess.Popen(["explorer", export_folder_path], shell=True)
