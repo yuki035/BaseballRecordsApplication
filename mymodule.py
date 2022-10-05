@@ -45,3 +45,9 @@ def calc_pitch_record(df: pd.DataFrame):
     df['WHIP'] = (df['与四球'] + df['被安打']) / IP
     df['投球数/回'] = df['投球数']/IP
     df.fillna(0, inplace=True)
+    
+def set_rate_format(ws: px.Workbook.worksheets, beginning: int):
+    for col in ws.iter_cols(min_row=2, min_col=beginning):
+        for cell in col:
+            cell.number_format = "0.000"
+            
