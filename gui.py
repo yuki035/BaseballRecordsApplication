@@ -28,7 +28,7 @@ class Application(tkinter.Frame):
         # プログラムの状況をメッセージ出力
         self.team_record_status_label = tkinter.Label(self)
         self.team_record_status_label.place(x=150, y=32)
-        self.team_record_status_label['text'] = 'ボタンをタップ'
+        self.team_record_status_label['text'] = '実行待ち'
         
         # 個人成績生成ボタン
         self.player_record_btn = tkinter.Button(self, text="個人成績を生成", 
@@ -38,7 +38,7 @@ class Application(tkinter.Frame):
         # プログラムの状況をメッセージ出力
         self.player_record_status_label = tkinter.Label(self)
         self.player_record_status_label.place(x=150, y=77)
-        self.player_record_status_label['text'] = 'ボタンをタップ' 
+        self.player_record_status_label['text'] = '実行待ち' 
     
     def button_click(self, func):
         thread = threading.Thread(target=func)
@@ -57,7 +57,7 @@ class Application(tkinter.Frame):
         finally:
             self.team_record_btn['state'] = 'normal'
             time.sleep(3)
-            self.team_record_status_label['text'] = 'ボタンをタップ'
+            self.team_record_status_label['text'] = '実行待ち'
             
     def make_playerrecord_with_status(self):
         self.player_record_btn['state'] = tkinter.DISABLED
@@ -72,7 +72,7 @@ class Application(tkinter.Frame):
         finally:
             self.player_record_btn['state'] = tkinter.NORMAL
             time.sleep(3)
-            self.player_record_status_label['text'] = 'ボタンをタップ'
+            self.player_record_status_label['text'] = '実行待ち'
 
 def main():
     root = tkinter.Tk()
