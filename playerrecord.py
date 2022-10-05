@@ -4,6 +4,7 @@ import mymodule
 import subprocess
 import openpyxl as px
 from openpyxl.styles import Alignment, PatternFill
+from itertools import accumulate
 
 def get_game_metadata(file_path):
     _game = file_path.split('\\')[-1]
@@ -85,6 +86,80 @@ def set_format(ws: px.Workbook.worksheets, games, beginning_rate, deep_color, th
     set_format_row1(ws)
     set_format_index(ws)
     set_backgroud_color(ws, deep_color, thin_color)    
+
+# グラフ作成
+def make_avg_graph_sheet(ws_bat: pd.DataFrame, ws_avg: pd.DataFrame):
+    
+    # カラムを設定
+    columns = ['日付', '打数', '安打', '打率', '通算']
+    i = 1
+    for column in columns:
+        ws_avg.cell(row=1, column=i).value = column
+        i+=1
+    
+    #とりあえず日付をコピー（セル結合は無視）
+    i = 2
+    for col in ws_bat.iter_cols(min_row=2, max_col=1):
+        for cell in col:
+                ws_avg.cell(row=i,column=1).value = cell.value
+                i+=1
+
+    #NANの部分を補填
+    i = 2
+    for col in ws_avg.iter_cols(min_row=2,max_col=1,max_row=ws_bat.max_row-1):
+        for cell in col:
+            if cell.value is None:
+                ws_avg.cell(row=i,column=1).value = ws_avg.cell(row=i-1,column=1).value
+            i+=1
+    
+    at_bats = []
+    hits = []
+    at_bats_col_num = 5
+    hits_col_num = 6
+    at_bats_cumulative = []
+    hits_cumulative = []
+    
+    for col in ws_bat.iter_cols(min_row=2, min_col=5, max_row=ws_bat.max_row-1, max_col=6):
+        for cell in col:
+            if cell.column == at_bats_col_num:
+                at_bats.append(cell.value)
+            elif cell.column == hits_col_num:
+                hits.append(cell.value)
+    at_bats_cumulative = list(accumulate(at_bats))
+    hits_cumulative = list(accumulate(hits))
+    
+    # 打率推移シートに累積和を渡す
+    for i in range(ws_bat.max_row-2):
+        ws_avg.cell(row=i+2, column=2).value = at_bats_cumulative[i]
+        ws_avg.cell(row=i+2, column=3).value = hits_cumulative[i]
+        
+    for i in range(ws_bat.max_row-2):
+        if at_bats_cumulative[i] == 0:
+            avg = 0.000
+        else:
+            avg = hits_cumulative[i]/at_bats_cumulative[i]
+        ws_avg.cell(row=i+2, column=4).value = avg
+      
+    if at_bats_cumulative[-1] == 0:
+        total_avg = 0.000
+    else:
+        total_avg = hits_cumulative[-1]/at_bats_cumulative[-1]
+    for i in range(ws_bat.max_row-2):
+        ws_avg.cell(row=i+2, column=5).value = total_avg
+
+    chart = px.chart.LineChart()
+    data = px.chart.Reference(ws_avg, min_col=4, max_col=5, min_row=1, max_row=ws_avg.max_row-1)
+    categories = px.chart.Reference(ws_avg, min_col=1, max_col=1, min_row=2, max_row=ws_avg.max_row-1)
+    chart.add_data(data, titles_from_data=True)
+    chart.set_categories(categories)
+    chart.style = 34
+    chart.title='打率の推移'
+    chart.height=9
+    chart.width=16
+    chart.x_axis.title = '日付'
+
+    ws_avg.add_chart(chart, "G2")
+
 
 def main():
     
@@ -170,13 +245,20 @@ def main():
                 
         # 書式設定
         wb= px.load_workbook(export_folder_path+'/'+bat_player_name+'.xlsx')
+        #打撃成績
         ws_bat = wb.worksheets[0]
         set_format(ws_bat, bat_games, beginning_bat_rate, BAT_DARK_COLOR, BAT_THIN_COLOR)
-        
-        # 投手成績の書式設定
+        # 投手成績
         if is_pitch:
             ws_pitch = wb.worksheets[1]
             set_format(ws_pitch, pitch_games, beginning_pitch_rate, PITCH_DARK_COLOR, PITCH_THIN_COLOR)
+            
+        # 打撃の推移グラフを作成
+        wb.create_sheet('打率推移')
+        ws_avg = wb['打率推移']
+        
+        make_avg_graph_sheet(ws_bat, ws_avg)
+        
         
         #保存
         wb.save(export_folder_path+'/'+bat_player_name+'.xlsx')
