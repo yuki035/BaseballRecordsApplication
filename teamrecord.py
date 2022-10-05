@@ -101,6 +101,15 @@ def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color
 
 def main():
     
+    BAT_TITLE_CELL_COLOR = 'A4C6FF'
+    BAT_NAME_CELL_COLOR = 'D9E5FF'
+
+    PITCH_TITLE_CELL_COLOR = 'FFA3A3'
+    PITCH_NAME_CELL_COLOR = 'FFD9D9'
+    
+    beginning_bat_rate = 25
+    beginning_pitch_rate = 18
+    
     print("start")
     
     # パスを設定
@@ -162,8 +171,6 @@ def main():
     ws_pitch['A1'] = str(games)+ '試合'
     
     # 率を小数第三位までに設定
-    beginning_bat_rate = 25
-    beginning_pitch_rate = 18
     set_rate_format(beginning=beginning_bat_rate, ws=ws_bat)
     set_rate_format(beginning=beginning_pitch_rate, ws=ws_pitch)
         
@@ -180,12 +187,6 @@ def main():
     ws_pitch['A1'].alignment = Alignment(horizontal = 'center', vertical='center')
     
     #　セルの塗りつぶし　1列目→1行目→最終行目
-    BAT_TITLE_CELL_COLOR = 'A4C6FF'
-    BAT_NAME_CELL_COLOR = 'D9E5FF'
-
-    PITCH_TITLE_CELL_COLOR = 'FFA3A3'
-    PITCH_NAME_CELL_COLOR = 'FFD9D9'
-    
     set_backgroud_color(ws=ws_bat, title_color=BAT_TITLE_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
     set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITLE_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
     
