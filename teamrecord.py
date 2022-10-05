@@ -85,27 +85,27 @@ def set_vertical_writing_row1(ws: px.Workbook.worksheets):
             cell.alignment = Alignment(vertical='center', textRotation=255)
     
 #　セルの背景色を設定
-def set_backgroud_color(ws: px.Workbook.worksheets, title_color: str, name_color: str):
+def set_backgroud_color(ws: px.Workbook.worksheets, dark_color: str, thin_color: str):
     max_row = ws.max_row
     # name
     for col in ws.iter_cols(min_row=2, max_row=max_row, max_col=1):  
         for cell in col:
-            cell.fill = PatternFill(patternType = 'solid', fgColor=name_color)
+            cell.fill = PatternFill(patternType = 'solid', fgColor=thin_color)
     # title
     for row in ws.iter_rows(max_row=1):
         for cell in row:
-            cell.fill = PatternFill(patternType = 'solid', fgColor=title_color)
+            cell.fill = PatternFill(patternType = 'solid', fgColor=dark_color)
     for row in ws.iter_rows(min_row=max_row):
         for cell in row:
-            cell.fill = PatternFill(patternType = 'solid', fgColor=title_color)
+            cell.fill = PatternFill(patternType = 'solid', fgColor=dark_color)
 
 def main():
     
-    BAT_TITLE_CELL_COLOR = 'A4C6FF'
-    BAT_NAME_CELL_COLOR = 'D9E5FF'
+    BAT_DARK_COLOR = 'A4C6FF'
+    BAT_THIN_COLOR = 'D9E5FF'
 
-    PITCH_TITLE_CELL_COLOR = 'FFA3A3'
-    PITCH_NAME_CELL_COLOR = 'FFD9D9'
+    PITCH_DARK_COLOR = 'FFA3A3'
+    PITCH_THIN_COLOR = 'FFD9D9'
     
     beginning_bat_rate = 25
     beginning_pitch_rate = 18
@@ -187,8 +187,8 @@ def main():
     ws_pitch['A1'].alignment = Alignment(horizontal = 'center', vertical='center')
     
     #　セルの塗りつぶし　1列目→1行目→最終行目
-    set_backgroud_color(ws=ws_bat, title_color=BAT_TITLE_CELL_COLOR, name_color= BAT_NAME_CELL_COLOR)
-    set_backgroud_color(ws=ws_pitch, title_color=PITCH_TITLE_CELL_COLOR, name_color=PITCH_NAME_CELL_COLOR)
+    set_backgroud_color(ws=ws_bat, dark_color=BAT_DARK_COLOR, thin_color= BAT_THIN_COLOR)
+    set_backgroud_color(ws=ws_pitch, dark_color=PITCH_DARK_COLOR, thin_color=PITCH_THIN_COLOR)
     
     #保存
     wb.save(export_folder_path+'/通算_'+date+'.xlsx')
