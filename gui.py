@@ -19,16 +19,35 @@ class Application(tkinter.Frame):
         
         # チーム成績生成ボタン
         team_record_btn = tkinter.Button(self, text="チーム成績を生成",
-                                         command=teamrecord.main)
-        team_record_btn.place(x= 140, y = 100)
+                                         command=self.make_teamrecord_with_status)
+        team_record_btn.pack()
+        
+        # プログラムの状況をメッセージ出力
+        self.teamrecord_program_status_message = tkinter.Message(self)
+        self.teamrecord_program_status_message.pack()
+        self.teamrecord_program_status_message['text'] = 'テスト'
         
         # 個人成績生成ボタン
         player_record_btn = tkinter.Button(self, text="個人成績を生成",
                                            command=self.test)
-        player_record_btn.place(x = 140, y = 150)
+        player_record_btn.pack()
+        
+        # プログラムの状況をメッセージ出力
+        self.playerrecord_program_status_message = tkinter.Message(self)
+        self.playerrecord_program_status_message.pack()
+        self.playerrecord_program_status_message['text'] = 'テスト'
         
     def test(self):
         print('ボタンが押された')
+        self.playerrecord_program_status_message['text'] = 'ボタンが押された'
+        
+    def make_teamrecord_with_status(self):
+        try:
+            self.teamrecord_program_status_message['text'] = '実行中'
+            teamrecord.main()
+            self.teamrecord_program_status_message['text'] = '完了'
+        except:
+            self.teamrecord_program_status_message['text'] = 'エラー'
         
 
 def main():
