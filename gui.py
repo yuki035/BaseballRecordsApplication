@@ -2,6 +2,7 @@ import tkinter
 import teamrecord
 import playerrecord
 import threading
+import time
 
 class Application(tkinter.Frame):
     def __init__(self, root=None):
@@ -55,6 +56,8 @@ class Application(tkinter.Frame):
             self.team_record_status_label['text'] = '完了'
         finally:
             self.team_record_btn['state'] = 'normal'
+            time.sleep(3)
+            self.team_record_status_label['text'] = 'ボタンをタップ'
             
     def make_playerrecord_with_status(self):
         self.player_record_btn['state'] = tkinter.DISABLED
@@ -68,6 +71,8 @@ class Application(tkinter.Frame):
             self.player_record_status_label['text'] = '完了'
         finally:
             self.player_record_btn['state'] = tkinter.NORMAL
+            time.sleep(3)
+            self.player_record_status_label['text'] = 'ボタンをタップ'
 
 def main():
     root = tkinter.Tk()
