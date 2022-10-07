@@ -1,13 +1,10 @@
-import os
 import pandas as pd
 import datetime
 import subprocess
 import openpyxl as px
 import mymodule
-import sys
 from openpyxl.xml.constants import NAMESPACES
 from openpyxl.styles import Alignment, PatternFill
-
     
 # 試合結果の全データを打撃/投手別で統合
 def concat_games(paths, df_bat, df_pitch):
