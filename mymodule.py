@@ -1,6 +1,15 @@
 import glob
 import pandas as pd
 import openpyxl as px
+import os
+import sys
+
+def get_dirname():
+    if getattr(sys, 'frozen', False):
+        dirname = os.path.dirname((sys.executable))
+    else:
+        dirname = os.path.dirname(__file__)
+    return dirname
 
 # フォルダにあるエクセルファイルの絶対パスのリストを取得
 def get_xlsx_file_paths(folder_path):
@@ -45,7 +54,8 @@ def calc_pitch_record(df: pd.DataFrame):
     df['WHIP'] = (df['与四球'] + df['被安打']) / IP
     df['投球数/回'] = df['投球数']/IP
     df.fillna(0, inplace=True)
-    
+
+# 率を小数第三位までに設定    
 def set_rate_format(ws: px.Workbook.worksheets, beginning: int):
     for col in ws.iter_cols(min_row=2, min_col=beginning):
         for cell in col:
