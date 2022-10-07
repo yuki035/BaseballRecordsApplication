@@ -1,4 +1,5 @@
 import os
+import sys
 import pandas as pd
 import mymodule
 import subprocess
@@ -16,6 +17,7 @@ def insert_game_metadata(df, date, style, team):
     df.insert(1,'試合形式',style)
     df.insert(2,'チーム',team)
 
+# 試合結果を統合
 def concat_games(paths, df_bat, df_pitch):
     for path in paths:
         date, style, team = get_game_metadata(path)
@@ -175,7 +177,7 @@ def main():
     print("start")
     
     # パスを設定
-    dirname = os.path.dirname(__file__)
+    dirname = mymodule.get_dirname()
     import_foloder_path = dirname + '\試合結果'
     export_folder_path  = dirname + '\個人成績'
     
@@ -245,7 +247,7 @@ def main():
                 
         # 書式設定
         wb= px.load_workbook(export_folder_path+'/'+bat_player_name+'.xlsx')
-        #打撃成績
+        # 打撃成績
         ws_bat = wb.worksheets[0]
         set_format(ws_bat, bat_games, beginning_bat_rate, BAT_DARK_COLOR, BAT_THIN_COLOR)
         # 投手成績
@@ -258,8 +260,7 @@ def main():
         ws_avg = wb['打率推移']
         
         make_avg_graph_sheet(ws_bat, ws_avg)
-        
-        
+                
         #保存
         wb.save(export_folder_path+'/'+bat_player_name+'.xlsx')
                 
