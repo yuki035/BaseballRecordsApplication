@@ -1,5 +1,3 @@
-import os
-import sys
 import pandas as pd
 import mymodule
 import subprocess
@@ -156,7 +154,7 @@ def make_avg_graph_sheet(ws_bat: pd.DataFrame, ws_avg: pd.DataFrame):
     chart.set_categories(categories)
     chart.style = 34
     chart.title='打率の推移'
-    chart.height=9
+    chart.height=13
     chart.width=16
     chart.x_axis.title = '日付'
 
